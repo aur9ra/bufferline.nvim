@@ -647,6 +647,7 @@ local function get_defaults()
     left_trunc_marker = "",
     right_trunc_marker = "",
     separator_style = "thin",
+    padding_style = "padded",
     name_formatter = nil,
     truncate_names = true,
     tab_size = 18,

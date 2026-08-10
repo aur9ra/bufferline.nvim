@@ -39,6 +39,7 @@
 ---@field public left_trunc_marker? string
 ---@field public right_trunc_marker? string
 ---@field public separator_style? string | {[1]: string, [2]: string}
+---@field public padding_style? string
 ---@field public name_formatter? (fun(path: string):string)?
 ---@field public tab_size? number
 ---@field public truncate_names? boolean
@@ -122,6 +123,7 @@
 ---@field public buf integer
 ---@field public icon string
 ---@field public name string
+---@field public raw_name string the unformatted tail name used for duplicate resolution
 ---@field public group string
 ---@field public letter string
 ---@field public modified boolean
@@ -143,6 +145,7 @@
 ---@field public name_formatter function? dictates how the name should be shown
 ---@field public id integer the buffer number
 ---@field public name string the visible name for the file
+---@field public raw_name string the unformatted tail name used for duplicate resolution
 ---@field public filename string
 ---@field public icon string the icon
 ---@field public icon_highlight string?

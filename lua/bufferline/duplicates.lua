@@ -26,9 +26,13 @@ function M.mark(elements)
   local duplicates_across_groups = options.duplicates_across_groups
   return utils.map(function(current)
     if current.path == "" then return current end
-    local duplicate = duplicates[current.name]
+    -- duplicate identity is the unformatted tail name: name_formatter output
+    -- can collide across extensions (user.ts vs user.go), which would mark
+    -- distinct files as duplicates and render empty ancestor prefixes ('/')
+    local name = current.raw_name or current.name
+    local duplicate = duplicates[name]
     if not duplicate then
-      duplicates[current.name] = { current }
+      duplicates[name] = { current }
     else
       local depth, limit, is_same_buffer = 1, 10, false
       for _, element in ipairs(duplicate) do

@@ -201,6 +201,13 @@ local function get_sections(items)
   return before, current, after
 end
 
+-- whether compact padding is active: collapses the phantom margin
+-- placeholders only for auto-sized tabs (tab_size = 0); any fixed tab size
+-- keeps stock rendering, so the option is a no-op there by design
+local function is_compact_padding(options)
+  return options.padding_style == "compact" and options.tab_size == 0
+end
+
 ---@param ctx bufferline.RenderContext
 ---@param length number
 ---@return bufferline.Segment?, bufferline.Segment?
@@ -215,7 +222,9 @@ local function add_space(ctx, length)
     local size = math.floor(difference / 2)
     left_size, right_size = size + left_size, size + right_size
   end
-  if not options.show_buffer_close_icons then
+  -- with compact padding there is no fixed width to preserve, so the hidden
+  -- close icon's width must not shift the tab
+  if not options.show_buffer_close_icons and not is_compact_padding(options) then
     right_size = right_size > 0 and right_size - strwidth(icon) or right_size
     left_size = left_size + strwidth(icon)
   end
@@ -320,6 +329,13 @@ local function add_suffix(context)
   local element = context.tab
   local hl = context.current_highlights
   local symbol = config.options.modified_icon
+  -- compact mode (auto-sized tabs): an unmodified buffer with hidden close
+  -- icons gets no width-reserving placeholder, letting the trailing spacing
+  -- collapse to a single space; hover reveal still works because this returns
+  -- the close-icon segment's own (possibly nil) result
+  if is_compact_padding(config.options) and not element.modified and not config.options.show_buffer_close_icons then
+    return get_close_icon(element.id, context)
+  end
   -- If the buffer is modified add an icon, if it isn't pad
   -- the buffer so it doesn't "jump" when it becomes modified i.e. due
   -- to the sudden addition of a new character

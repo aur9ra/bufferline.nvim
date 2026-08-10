@@ -105,6 +105,8 @@ end
 
 function Tabpage:new(tab)
   tab.name = fn.fnamemodify(tab.path, ":t")
+  -- keep the pre-format tail for duplicate resolution
+  tab.raw_name = tab.name
   assert(tab.buf, fmt("A tab must a have a buffer: %s", vim.inspect(tab)))
   tab.modifiable = vim.bo[tab.buf].modifiable
   tab.modified = get_modified_state(tab.buffers)
@@ -178,6 +180,9 @@ function Buffer:new(buf)
     name = fn.fnamemodify(buf.path, ":t")
     name = is_directory and name .. "/" or name
   end
+
+  -- keep the pre-format tail for duplicate resolution
+  buf.raw_name = name
 
   if buf.name_formatter and type(buf.name_formatter) == "function" then
     name = buf.name_formatter({ name = name, path = buf.path, bufnr = buf.id }) or name

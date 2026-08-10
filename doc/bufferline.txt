@@ -99,6 +99,14 @@ The available configuration are:
             max_prefix_length = 15, -- prefix used when a buffer is de-duplicated
             truncate_names = true, -- whether or not tab names should be truncated
             tab_size = 18,
+            -- "compact" collapses the phantom margin placeholders for
+            -- auto-sized tabs (tab_size = 0) so tabs render with strict
+            -- 1-space margins. only effective with tab_size = 0 and hidden
+            -- close icons (show_buffer_close_icons = false); any fixed tab
+            -- size renders stock regardless. unknown values behave like
+            -- "padded". a modified buffer widens its tab by 2 cells
+            -- (modified icon + space)
+            padding_style = "padded" | "compact",
             diagnostics = false | "nvim_lsp" | "coc",
             diagnostics_update_in_insert = false, -- only applies to coc
             diagnostics_update_on_event = true, -- use nvim's diagnostic handler
