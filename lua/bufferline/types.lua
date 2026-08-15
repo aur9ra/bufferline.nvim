@@ -40,6 +40,7 @@
 ---@field public right_trunc_marker? string
 ---@field public separator_style? string | {[1]: string, [2]: string}
 ---@field public padding_style? string
+---@field public hide_extension_when_icon_known? boolean
 ---@field public name_formatter? (fun(path: string):string)?
 ---@field public tab_size? number
 ---@field public truncate_names? boolean

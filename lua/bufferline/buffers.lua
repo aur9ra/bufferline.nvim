@@ -7,6 +7,7 @@ local pick = require("bufferline.pick") ---@module "bufferline.pick"
 local duplicates = require("bufferline.duplicates") ---@module "bufferline.duplicates"
 local diagnostics = require("bufferline.diagnostics") ---@module "bufferline.diagnostics"
 local models = require("bufferline.models") ---@module "bufferline.models"
+local extensions = require("bufferline.extensions") ---@module "bufferline.extensions"
 
 local M = {}
 
@@ -58,6 +59,9 @@ function M.get_components(state)
 
   pick.reset()
   duplicates.reset()
+  -- the stem-collision table must be rebuilt before any Buffer:new consults
+  -- it; gated on the opt-in so stock configs never pay for the scan
+  if options.hide_extension_when_icon_known then extensions.scan() end
   ---@type bufferline.Buffer[]
   local components = {}
   local all_diagnostics = diagnostics.get(options)

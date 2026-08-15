@@ -107,6 +107,18 @@ The available configuration are:
             -- "padded". a modified buffer widens its tab by 2 cells
             -- (modified icon + space)
             padding_style = "padded" | "compact",
+            --- hides a file's extension in its buffer label when the devicon
+            --- provider resolves a known icon for it (the icon then
+            --- communicates the type). extensions are kept for dotfiles,
+            --- extensionless and multi-dot names, unknown icon types, and
+            --- whenever stripping would make two different labels collide
+            --- (e.g. user.ts vs user.go, or a file whose stem equals an
+            --- unnamed buffer's label or a terminal's tail). same-name
+            --- files in different directories strip and rely on the
+            --- duplicate prefix. requires a devicon provider
+            --- (nvim-web-devicons or mini.icons). default false: labels
+            --- render exactly as without the option
+            hide_extension_when_icon_known = true | false,
             diagnostics = false | "nvim_lsp" | "coc",
             diagnostics_update_in_insert = false, -- only applies to coc
             diagnostics_update_on_event = true, -- use nvim's diagnostic handler

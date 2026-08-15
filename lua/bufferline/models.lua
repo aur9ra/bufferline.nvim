@@ -2,6 +2,8 @@ local lazy = require("bufferline.lazy")
 local utils = lazy.require("bufferline.utils") ---@module "bufferline.utils"
 local log = lazy.require("bufferline.utils.log") ---@module "bufferline.utils.log"
 local constants = lazy.require("bufferline.constants") ---@module "bufferline.constants"
+local config = lazy.require("bufferline.config") ---@module "bufferline.config"
+local extensions = lazy.require("bufferline.extensions") ---@module "bufferline.extensions"
 
 local M = {}
 
@@ -183,6 +185,19 @@ function Buffer:new(buf)
 
   -- keep the pre-format tail for duplicate resolution
   buf.raw_name = name
+
+  -- opt-in extension hiding: strip the extension when the devicon
+  -- communicates the type and no other listed buffer collides on the stem.
+  -- raw_name stays the full tail, so duplicate identity is unaffected
+  if
+    config.options.hide_extension_when_icon_known
+    and buf.path
+    and #buf.path > 0
+    and not is_directory
+    and buf.buftype == ""
+  then
+    name = extensions.strip(name) or name
+  end
 
   if buf.name_formatter and type(buf.name_formatter) == "function" then
     name = buf.name_formatter({ name = name, path = buf.path, bufnr = buf.id }) or name

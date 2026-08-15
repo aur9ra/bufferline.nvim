@@ -648,6 +648,9 @@ local function get_defaults()
     right_trunc_marker = "",
     separator_style = "thin",
     padding_style = "padded",
+    -- strip the extension from a buffer label when the devicon communicates
+    -- the file type and no other listed buffer would collide on the stem
+    hide_extension_when_icon_known = false,
     name_formatter = nil,
     truncate_names = true,
     tab_size = 18,
