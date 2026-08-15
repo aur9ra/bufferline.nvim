@@ -204,9 +204,7 @@ end
 -- whether compact padding is active: collapses the phantom margin
 -- placeholders only for auto-sized tabs (tab_size = 0); any fixed tab size
 -- keeps stock rendering, so the option is a no-op there by design
-local function is_compact_padding(options)
-  return options.padding_style == "compact" and options.tab_size == 0
-end
+local function is_compact_padding(options) return options.padding_style == "compact" and options.tab_size == 0 end
 
 ---@param ctx bufferline.RenderContext
 ---@param length number
