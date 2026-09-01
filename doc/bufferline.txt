@@ -102,10 +102,9 @@ The available configuration are:
             -- "compact" collapses the phantom margin placeholders for
             -- auto-sized tabs (tab_size = 0) so tabs render with strict
             -- 1-space margins. only effective with tab_size = 0 and hidden
-            -- close icons (show_buffer_close_icons = false); any fixed tab
-            -- size renders stock regardless. unknown values behave like
-            -- "padded". a modified buffer widens its tab by 2 cells
-            -- (modified icon + space)
+            -- close icons (show_buffer_close_icons = false); unknown
+            -- values behave like "padded". a modified buffer widens
+            -- its tab by 2 cells (modified icon + space)
             padding_style = "padded" | "compact",
             --- hides a file's extension in its buffer label when the devicon
             --- provider resolves a known icon for it (the icon then
@@ -115,9 +114,10 @@ The available configuration are:
             --- (e.g. user.ts vs user.go, or a file whose stem equals an
             --- unnamed buffer's label or a terminal's tail). same-name
             --- files in different directories strip and rely on the
-            --- duplicate prefix. requires a devicon provider
-            --- (nvim-web-devicons or mini.icons). default false: labels
-            --- render exactly as without the option
+            --- duplicate prefix. requires the nvim-web-devicons provider.
+            --- applies in buffers mode only; in tabs mode extensions are
+            --- never stripped. default false: labels render exactly as
+            --- without the option
             hide_extension_when_icon_known = true | false,
             diagnostics = false | "nvim_lsp" | "coc",
             diagnostics_update_in_insert = false, -- only applies to coc
@@ -1250,7 +1250,7 @@ so they can be more easily overriden if that is the user's preference.
 ISSUES							*bufferline-issues*
 
 Please raise any issues you encounter whilst using this plugin at:
-https://github.com/akinsho/bufferline.lua/issues
+https://github.com/aur9ra/bufferline.nvim/issues
 
 
 vim:tw=78:sw=4:ft=help:norl:
