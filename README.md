@@ -1,10 +1,14 @@
-[![CI](https://github.com/akinsho/bufferline.nvim/actions/workflows/ci.yaml/badge.svg)](https://github.com/akinsho/bufferline.nvim/actions/workflows/ci.yaml)
+[![CI](https://github.com/aur9ra/bufferline.nvim/actions/workflows/ci.yaml/badge.svg)](https://github.com/aur9ra/bufferline.nvim/actions/workflows/ci.yaml)
 
 <h1 align="center">
   bufferline.nvim
 </h1>
 
 <p align="center">A <i>snazzy</i> 💅 buffer line (with tabpage integration) for Neovim built using <b>lua</b>.</p>
+
+> This is a not-so-maintained, sole-author-oriented, did-it-for-a-few-features fork of [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim), which has been unmaintained since January 2025 (v4.9.1).
+
+> This fork adds opt-in compact tab margins (`options.padding_style = "compact"`), opt-in smart extension hiding (`options.hide_extension_when_icon_known`), and raw filename-based duplicate resolution. Option details: `:h bufferline-configuration`. If this fork happens to be useful to you, great! Consider [sponsoring the original plugin author](https://github.com/sponsors/akinsho).
 
 ![Demo GIF](https://user-images.githubusercontent.com/22454918/111992693-9c6a9b00-8b0d-11eb-8c39-19db58583061.gif)
 
@@ -45,17 +49,16 @@ It was inspired by a screenshot of DOOM Emacs using [centaur tabs](https://githu
 
 ## Installation
 
-It is advised that you specify either the latest tag or a specific tag and bump them manually if you'd prefer to inspect changes before updating.
-If you'd like to use an older version of the plugin compatible with nvim-0.6.1 and below please change your tag to `tag = "v1.*"`
+Install from the default branch using your preferred plugin manager.
 
 **Lua**
 
 ```lua
 -- using packer.nvim
-use {'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devicons'}
+use {'aur9ra/bufferline.nvim', requires = 'nvim-tree/nvim-web-devicons'}
 
 -- using lazy.nvim
-{'akinsho/bufferline.nvim', version = "*", dependencies = 'nvim-tree/nvim-web-devicons'}
+{'aur9ra/bufferline.nvim', dependencies = 'nvim-tree/nvim-web-devicons'}
 ```
 
 **Vimscript**
@@ -63,7 +66,7 @@ use {'akinsho/bufferline.nvim', tag = "*", requires = 'nvim-tree/nvim-web-devico
 ```vim
 Plug 'nvim-tree/nvim-web-devicons' " Recommended (for coloured icons)
 " Plug 'ryanoasis/vim-devicons' Icons without colours
-Plug 'akinsho/bufferline.nvim', { 'tag': '*' }
+Plug 'aur9ra/bufferline.nvim'
 ```
 
 ## Usage
@@ -261,6 +264,10 @@ see `:help bufferline-numbers` for more details
 #### Unique names
 
 ![duplicate names](https://user-images.githubusercontent.com/22454918/111993343-6da0f480-8b0e-11eb-8d93-44019458d2c9.png)
+
+Buffer name de-duplication keying now takes place on the raw pre-formatter filename (`raw_name`) rather than formatted labels. As such, same-stem different-extension buffer names (e.g. user.ts vs user.go) are no longer treated as duplicates of each other, eliminating the broken empty-ancestor (`/`) prefixes they could produce.
+
+Visible labels remain determined by `name_formatter` and, when enabled, the extension-hiding policy. Buffers with the same filename from different directories are still de-duplicated with directory prefixes, per the existing `show_duplicate_prefix` option.
 
 ---
 
