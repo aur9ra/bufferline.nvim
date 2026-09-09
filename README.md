@@ -8,7 +8,9 @@
 
 > This is a not-so-maintained, sole-author-oriented, did-it-for-a-few-features fork of [akinsho/bufferline.nvim](https://github.com/akinsho/bufferline.nvim), which has been unmaintained since January 2025 (v4.9.1).
 
-> This fork adds opt-in compact tab margins (`options.padding_style = "compact"`), opt-in smart extension hiding (`options.hide_extension_when_icon_known`), and raw filename-based duplicate resolution. Option details: `:h bufferline-configuration`. If this fork happens to be useful to you, great! Consider [sponsoring the original plugin author](https://github.com/sponsors/akinsho).
+This fork adds configuration settings for compact tab margins (`options.padding_style = "compact"`), smart extension hiding (`options.hide_extension_when_icon_known`), and raw filename-based duplicate resolution. To see more on configuration and option details, see `:h bufferline-configuration`.
+
+If this fork happens to be useful to you, great! Consider [sponsoring the original plugin author](https://github.com/sponsors/akinsho).
 
 ![Demo GIF](https://user-images.githubusercontent.com/22454918/111992693-9c6a9b00-8b0d-11eb-8c39-19db58583061.gif)
 
@@ -19,6 +21,8 @@
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Features](#features)
+  - [Compact tab margins](#compact-tab-margins)
+  - [Extension hiding](#extension-hiding)
   - [Alternate styling](#alternate-styling)
   - [Hover events](#hover-events)
   - [Underline indicator](#underline-indicator)
@@ -106,6 +110,50 @@ for more details on how to configure this plugin in details please see `:h buffe
 - Sort buffers by `extension`, `directory` or pass in a custom compare function
 
 - Configuration via lua functions for greater customization.
+
+#### Compact tab margins
+
+Set `options.padding_style = "compact"` to enable compact margins. For auto-sized tabs (`tab_size = 0`) with hidden close icons, compact margins replace phantom/dynamic margins with strict 1-space margins.
+
+Unknown values for `padding_style` behave like `"padded"`.
+
+![Compact tab margins](.github/assets/compact-compact.png)
+
+_`padding_style = "compact"` uses strict 1-space margins between tab edges, buffer names, icons, etc._
+
+![Padded tab margins](.github/assets/compact-padded.png)
+
+_`padding_style = "padded"` retains upstream-style phantom margins._
+
+See `:h bufferline-configuration` for configuration details.
+
+#### Extension hiding
+
+Extension hiding is enabled via `options.hide_extension_when_icon_known`. When enabled, this feature strips a file's extension when the icon provider (default: `nvim-web-devicons`) provides an icon, and no other open buffer would collide on the shared stripped pre-extension buffer name (stem).
+
+This feature keeps full names for dotfiles, multi-dot and extensionless names, types that are not provided an icon by the icon provider, directories, terminals, unnamed buffers, and trailing-dot names. Same-name files in different directories strip and rely on the duplicate prefix.
+
+![Extension hiding enabled](.github/assets/extension-strip.png)
+
+_Known icons allow `init.lua` and `config.lua` to display as `init` and `config`._
+
+![Extension hiding disabled](.github/assets/extension-off.png)
+
+_With extension hiding off, the full names `init.lua` and `config.lua` are visible._
+
+![Extension collision](.github/assets/extension-collision.png)
+
+_`user.ts` and `user.go` keep their full names when their stripped pre-extension buffer name collide._
+
+![Duplicate prefix](.github/assets/duplicate-prefix.png)
+
+_Same-name buffers display as `a/README` and `b/README`._
+
+![Extension hiding exemptions](.github/assets/extension-exemptions.png)
+
+_Dotfile, multi-dot, extensionless, unknown-icon, and trailing-dot names keep their full names._
+
+See `:h bufferline-configuration` for configuration details.
 
 #### Alternate styling
 
