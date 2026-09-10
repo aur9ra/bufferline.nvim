@@ -1,71 +1,46 @@
 name: CI
 on:
   push:
-    #   paths-ignore:
-    #     - ".github/**"
-    #     - "*.md"
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   format:
+    name: Style check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: JohnnyMorganz/stylua-action@v2
-        with:
-          version: latest
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --config-path=stylua.toml lua/
-      - name: Commit files
+      - uses: actions/checkout@v5
+      - name: Install StyLua v2.5.2
         run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          if ! [[ -z $(git status -s) ]]; then
-            git commit -m "chore: formatting" lua/*
-          fi
-      - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          curl -fsSL -o /tmp/stylua.zip https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-linux-x86_64.zip
+          unzip -q /tmp/stylua.zip -d /tmp/stylua
+          chmod +x /tmp/stylua/stylua
+          echo "/tmp/stylua" >> "$GITHUB_PATH"
+      - name: Check formatting
+        run: stylua --check --config-path=stylua.toml lua/
 
   tests:
-    name: Tests
+    name: Tests (latest stable Neovim)
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Neovim
-        shell: bash
+      - uses: actions/checkout@v5
+      - name: Install latest stable Neovim
         run: |
+          curl -fsSL -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
           mkdir -p /tmp/nvim
-          wget -q https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage -O /tmp/nvim/nvim.appimage
-          cd /tmp/nvim
-          chmod a+x ./nvim.appimage
-          ./nvim.appimage --appimage-extract
-          echo "/tmp/nvim/squashfs-root/usr/bin/" >> $GITHUB_PATH
-
+          tar -xzf /tmp/nvim.tar.gz -C /tmp/nvim --strip-components=1
+          echo "/tmp/nvim/bin" >> "$GITHUB_PATH"
       - name: Run tests
         run: |
+          test -d tests || { echo "::error::tests directory is missing"; exit 1; }
+          test -f tests/minimal_init.lua || { echo "::error::tests/minimal_init.lua is missing"; exit 1; }
           nvim --version
-          [ ! -d tests ] && exit 0
           nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/ {minimal_init = 'tests/minimal_init.lua', sequential = true}"
-
-  release:
-    name: release
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release
-        with:
-          release-type: simple
-          package-name: bufferline.nvim
-      - uses: actions/checkout@v3
-      - name: tag stable versions
-        if: ${{ steps.release.outputs.release_created }}
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email github-actions[bot]@users.noreply.github.com
-          git remote add gh-token "https://${{ secrets.GITHUB_TOKEN }}@github.com/google-github-actions/release-please-action.git"
