@@ -136,6 +136,113 @@ describe("Bufferline tests:", function()
     end)
   end)
 
+  describe("compact padding - ", function()
+    local base_options = {
+      buffer_close_icon = "x",
+      close_icon = "X",
+      modified_icon = "M",
+      get_element_icon = function() return "F" end,
+      show_close_icon = false,
+      show_buffer_close_icons = false,
+      tab_size = 0,
+      truncate_names = false,
+      separator_style = "thin",
+      sort_by = "id",
+    }
+
+    local function configure(overrides)
+      bufferline.setup({ options = vim.tbl_extend("force", vim.deepcopy(base_options), overrides or {}) })
+    end
+
+    local function open_tabs()
+      vim.cmd("file! a.txt")
+      vim.cmd("edit b.txt")
+      vim.cmd("edit c.txt")
+    end
+
+    local function snapshot()
+      local tabline, components = nvim_bufferline()
+      assert.is_truthy(tabline)
+      return utils.tabline_from_components(components), components
+    end
+
+    local function component_width(component)
+      local width = 0
+      for _, segment in ipairs(component) do
+        width = width + vim.api.nvim_strwidth(segment.text or "")
+      end
+      return width
+    end
+
+    it("should use strict one-space margins for auto-sized tabs when compact", function()
+      configure({ padding_style = "compact" })
+      open_tabs()
+      local rendered, components = snapshot()
+      assert.is_equal(#components, 3)
+      assert.is_equal(rendered, " F a.txt ▕ F b.txt ▕▎F c.txt ")
+    end)
+
+    it("should keep placeholder margins for auto-sized tabs when padded", function()
+      configure({ padding_style = "padded" })
+      open_tabs()
+      local rendered = snapshot()
+      assert.is_equal(rendered, "  F a.txt   ▕  F b.txt   ▕▎ F c.txt   ")
+    end)
+
+    it("should widen a modified compact tab by exactly two display cells", function()
+      configure({ padding_style = "compact" })
+      vim.cmd("file! a.txt")
+      local _, unmodified = snapshot()
+      local unmodified_width = component_width(unmodified[1])
+
+      vim.bo[vim.api.nvim_get_current_buf()].modified = true
+      local _, modified = snapshot()
+      local modified_width = component_width(modified[1])
+
+      assert.is_equal(modified_width - unmodified_width, 2)
+      assert.is_equal(utils.tabline_from_components(modified), "▎F a.txt M ")
+    end)
+
+    it("should match padded output when tab_size is greater than zero", function()
+      open_tabs()
+      configure({ padding_style = "compact", tab_size = 18 })
+      local compact = snapshot()
+      configure({ padding_style = "padded", tab_size = 18 })
+      local padded = snapshot()
+      assert.is_equal(compact, padded)
+      assert.is_equal(compact, "       F a.txt       ▕       F b.txt       ▕▎      F c.txt       ")
+    end)
+
+    it("should match padded output when buffer close icons are visible", function()
+      open_tabs()
+      configure({ padding_style = "compact", show_buffer_close_icons = true })
+      local compact = snapshot()
+      configure({ padding_style = "padded", show_buffer_close_icons = true })
+      local padded = snapshot()
+      assert.is_equal(compact, padded)
+      assert.is_equal(compact, " F a.txt x ▕ F b.txt x ▕▎F c.txt x ")
+    end)
+
+    it("should behave like padded when padding_style is omitted", function()
+      open_tabs()
+      configure()
+      local omitted = snapshot()
+      configure({ padding_style = "padded" })
+      local padded = snapshot()
+      assert.is_equal(omitted, padded)
+      assert.is_equal(omitted, "  F a.txt   ▕  F b.txt   ▕▎ F c.txt   ")
+    end)
+
+    it("should behave like padded for an unknown padding_style", function()
+      open_tabs()
+      configure({ padding_style = "unknown" })
+      local unknown = snapshot()
+      configure({ padding_style = "padded" })
+      local padded = snapshot()
+      assert.is_equal(unknown, padded)
+    end)
+  end)
+
   describe("clicking - ", function()
     it("should left handle mouse clicks correctly", function()
       local bufnum = vim.api.nvim_get_current_buf()
